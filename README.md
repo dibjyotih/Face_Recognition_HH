@@ -18,7 +18,7 @@ The search is live. The code sends the provided image URL to Google Lens through
 
 ## Setup
 
-Prerequisites: Node.js 18+ and Python 3.10+. On first face scan, InsightFace downloads its Buffalo-L detection and ArcFace recognition models. This is a one-time model download.
+Prerequisites: Node.js 18+ and Python 3.10+. On first face scan, InsightFace downloads its Buffalo-L detection and ArcFace recognition models. This is a one-time model download. Python 3.11 or 3.12 is the most broadly supported choice if an ML wheel is unavailable for your Python release.
 
 ```powershell
 npm install
