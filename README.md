@@ -12,13 +12,13 @@ The search is live. The code sends the provided image URL to Google Lens through
 
 ## Stack
 
-- Python, ONNX Runtime ArcFace embeddings, FAISS vector search, optional SerpApi Google Lens, SHA-256
+- Python, InsightFace ArcFace embeddings, FAISS vector search, optional SerpApi Google Lens, SHA-256
 - Solidity `0.8.24`, Hardhat and ethers.js
 - Polygon Amoy is supported. A local Hardhat network is the recommended recording fallback.
 
 ## Setup
 
-Prerequisites: Node.js 18+ and Python 3.10+. No C++ compiler is required. On first face scan, the program downloads YuNet and the pre-trained Buffalo-L ArcFace ONNX model, then caches them under `data/models`. This is a one-time model download.
+Prerequisites: Node.js 18+ and Python 3.10+. On first face scan, InsightFace downloads its Buffalo-L detection and ArcFace recognition models. This is a one-time model download. Python 3.11 or 3.12 is the most broadly supported choice if an ML wheel is unavailable for your Python release.
 
 ```powershell
 npm install
