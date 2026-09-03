@@ -3,6 +3,5 @@ requests==2.32.3
 python-dotenv==1.0.1
 opencv-python==4.10.0.84
 insightface==0.7.3
-# Use compatible wheels on newer Python releases (including Python 3.13+).
-onnxruntime>=1.20,<1.30
-faiss-cpu>=1.11,<2
+onnxruntime==1.18.1
+faiss-cpu==1.8.0
