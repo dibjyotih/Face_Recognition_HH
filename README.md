@@ -3,8 +3,8 @@
 CLI proof-of-concept for the HH Goa 2026 Task 3 pipeline:
 
 ```text
-face scan -> ArcFace embedding -> local FAISS social-post search (or Google Lens)
-          -> selectable face-confirmed post -> SHA-256 evidence fingerprint
+face scan -> face encoding -> live Google Lens reverse-image search
+          -> face-confirm a returned post -> SHA-256 evidence fingerprint
           -> ContentRegistry anchor -> independent on-chain re-verification
 ```
 
@@ -12,13 +12,13 @@ The search is live. The code sends the provided image URL to Google Lens through
 
 ## Stack
 
-- Python, InsightFace ArcFace embeddings, FAISS vector search, optional SerpApi Google Lens, SHA-256
+- Python, OpenCV YuNet/SFace face detection and embeddings, SerpApi Google Lens, SHA-256
 - Solidity `0.8.24`, Hardhat and ethers.js
 - Polygon Amoy is supported. A local Hardhat network is the recommended recording fallback.
 
 ## Setup
 
-Prerequisites: Node.js 18+ and Python 3.10+. On first face scan, InsightFace downloads its Buffalo-L detection and ArcFace recognition models. This is a one-time model download.
+Prerequisites: Node.js 18+ and Python 3.10+. The OpenCV Python wheel is prebuilt, so no C++ build environment is required. On first face scan, the script downloads small YuNet and SFace ONNX models from the OpenCV Zoo and caches them under `data/models`.
 
 ```powershell
 npm install
@@ -62,29 +62,6 @@ python -m src.pipeline --camera
 ```
 
 A camera window opens. Press `SPACE` to capture or `Q` to cancel. The command uploads the captured image, searches Google Lens, prints face-confirmed Instagram/Facebook/X/Reddit candidates, and asks you to select one before anchoring it. Use `--camera-index 1` for another camera, `--select 1` for scripted selection, or `--include-web` to include normal web pages in the choices.
-
-## Fast local social-post index (recommended)
-
-This mode searches only a consented collection you create, but is substantially faster and repeatable. It needs no SerpApi key, no imgbb key, and no public upload.
-
-1. Copy `examples/posts.example.json` to `data/posts.json`. Add each consented post image under `data/posts/` and fill its real post URL, title, platform, and image path.
-2. Build the ArcFace/FAISS index:
-
-   ```powershell
-   python -m src.build_index --manifest .\data\posts.json
-   ```
-
-3. Scan and select a matching indexed post:
-
-   ```powershell
-   python -m src.pipeline --camera --local-index
-   ```
-
-The local index stores 512-dimensional normalized ArcFace embeddings and ranks candidates by cosine similarity. Re-run `build_index` whenever images are added or changed.
-
-### Required APIs
-
-Local mode does not need a face-search, image-hosting, Instagram, Facebook, X, or Reddit API. It requires only the local Hardhat RPC for recording; Polygon Amoy instead requires an Amoy RPC endpoint and funded test-wallet key. Google Lens remains optional and requires `SERPAPI_API_KEY`; camera Lens mode also requires `IMGBB_API_KEY`. Obtain social images only through user consent or platform access that you are authorized to use.
 
 ## Verify and tamper demo
 
