@@ -14,6 +14,7 @@ from dotenv import load_dotenv
 
 from .faces import encode_largest_face
 from .camera import capture_face_image
+from .local_index import DEFAULT_INDEX, DEFAULT_METADATA, search_index
 from .search import Match, find_confirmed_matches
 from .upload import upload_to_imgbb
 
@@ -82,12 +83,15 @@ def main() -> None:
     parser.add_argument("--source-url", help="Public HTTPS URL for the same source image")
     parser.add_argument("--camera", action="store_true", help="Capture the input image directly from a webcam")
     parser.add_argument("--camera-index", type=int, default=0)
+    parser.add_argument("--local-index", action="store_true", help="Search the consented local FAISS post index instead of Google Lens")
+    parser.add_argument("--index-path", default=str(DEFAULT_INDEX))
+    parser.add_argument("--index-metadata", default=str(DEFAULT_METADATA))
     parser.add_argument("--include-web", action="store_true", help="Also list non-social web pages returned by Lens")
     parser.add_argument("--select", type=int, help="Select a numbered result non-interactively")
     parser.add_argument("--uri", default="", help="Optional IPFS CID or immutable evidence URI")
     parser.add_argument("--verify-only", metavar="METADATA_JSON", help="Recompute and verify a saved evidence file")
     parser.add_argument("--evidence-index", type=int, default=-1, help="Array entry to verify; -1 selects the newest record")
-    parser.add_argument("--threshold", type=float, default=0.60)
+    parser.add_argument("--threshold", type=float, default=0.45)
     args = parser.parse_args()
     load_dotenv(ROOT / ".env")
 
@@ -108,10 +112,14 @@ def main() -> None:
     if not args.camera and not args.image:
         parser.error("Provide --camera or --image")
     image_path = capture_face_image(ROOT / "data" / "captures", args.camera_index) if args.camera else Path(args.image)
-    source_url = args.source_url or upload_to_imgbb(image_path)
     face = encode_largest_face(image_path)
-    print(f"Detected face at {face['box']}; generated a 128-D encoding. Searching Google Lens...")
-    matches = find_confirmed_matches(face["encoding"], source_url, ROOT / "data" / "candidates", args.threshold, not args.include_web)
+    if args.local_index:
+        print(f"Detected face at {face['box']}; searching local ArcFace/FAISS index...")
+        matches = search_index(face["encoding"], Path(args.index_path), Path(args.index_metadata), args.threshold)
+    else:
+        source_url = args.source_url or upload_to_imgbb(image_path)
+        print(f"Detected face at {face['box']}; generated ArcFace encoding. Searching Google Lens...")
+        matches = find_confirmed_matches(face["encoding"], source_url, ROOT / "data" / "candidates", args.threshold, not args.include_web)
     match = choose_match(matches, args.select)
     content_hash, metadata = fingerprint(match)
     evidence = ROOT / "data" / "evidence.json"

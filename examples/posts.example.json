@@ -1,0 +1,18 @@
+[
+  {
+    "id": "demo-instagram-001",
+    "platform": "Instagram",
+    "post_url": "https://www.instagram.com/p/replace-with-consented-post/",
+    "title": "Consented demo Instagram post",
+    "caption": "Optional caption retained in the evidence fingerprint.",
+    "image_path": "data/posts/instagram-demo.jpg"
+  },
+  {
+    "id": "demo-reddit-001",
+    "platform": "Reddit",
+    "post_url": "https://www.reddit.com/r/example/comments/replace/",
+    "title": "Consented demo Reddit post",
+    "caption": "Use a screenshot or downloaded image you are authorized to index.",
+    "image_path": "data/posts/reddit-demo.jpg"
+  }
+]
